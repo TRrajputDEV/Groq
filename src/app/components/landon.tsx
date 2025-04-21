@@ -7,55 +7,12 @@ export default function ComingSoonPage() {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [email, setEmail] = useState("");
     const [isSubscribed, setIsSubscribed] = useState(false);
-    const [countdown, setCountdown] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0
-    });
-
-    // Set launch date (2 weeks from now)
-    const launchDate = new Date();
-    launchDate.setDate(launchDate.getDate() + 14);
-
-    // Calculate time difference function
-    const calculateTimeLeft = () => {
-        const now = new Date();
-        const difference = launchDate.getTime() - now.getTime();
-        
-        if (difference <= 0) {
-            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-        }
-        
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-        
-        return { days, hours, minutes, seconds };
-    };
-
-    // Initialize theme
     useEffect(() => {
         const savedTheme = localStorage.getItem("theme") ||
             (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
 
         setTheme(savedTheme);
         document.documentElement.setAttribute("data-theme", savedTheme);
-    }, []);
-
-    // Initialize countdown timer and set up interval
-    useEffect(() => {
-        // Set initial countdown values
-        setCountdown(calculateTimeLeft());
-        
-        // Update countdown timer every second
-        const timer = setInterval(() => {
-            setCountdown(calculateTimeLeft());
-        }, 1000);
-        
-        // Clean up timer when component unmounts
-        return () => clearInterval(timer);
     }, []);
 
     // Track mouse position for the gradient effect
@@ -162,26 +119,6 @@ export default function ComingSoonPage() {
                         We're putting the finishing touches on DocToc, your personal AI health companion. Stay tuned for the revolution in healthcare assistance.
                     </p>
                 </div>
-
-                {/* Countdown Timer */}
-                {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 w-full max-w-lg animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
-                    <div className="flex flex-col items-center backdrop-blur-md bg-base-100/30 rounded-xl p-4 shadow-lg">
-                        <span className="text-4xl font-bold text-blue-500">{countdown.days}</span>
-                        <span className="text-sm text-base-content/70">Days</span>
-                    </div>
-                    <div className="flex flex-col items-center backdrop-blur-md bg-base-100/30 rounded-xl p-4 shadow-lg">
-                        <span className="text-4xl font-bold text-blue-500">{countdown.hours}</span>
-                        <span className="text-sm text-base-content/70">Hours</span>
-                    </div>
-                    <div className="flex flex-col items-center backdrop-blur-md bg-base-100/30 rounded-xl p-4 shadow-lg">
-                        <span className="text-4xl font-bold text-blue-500">{countdown.minutes}</span>
-                        <span className="text-sm text-base-content/70">Minutes</span>
-                    </div>
-                    <div className="flex flex-col items-center backdrop-blur-md bg-base-100/30 rounded-xl p-4 shadow-lg">
-                        <span className="text-4xl font-bold text-blue-500">{countdown.seconds}</span>
-                        <span className="text-sm text-base-content/70">Seconds</span>
-                    </div>
-                </div> */}
 
                 {/* Email Notification Form */}
                 <div className="w-full max-w-md mb-12 animate-fadeInUp" style={{ animationDelay: '0.9s' }}>
