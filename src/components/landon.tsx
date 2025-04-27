@@ -1,12 +1,12 @@
 'use client';
 import { useState, useEffect } from "react";
-import { Stethoscope, Calendar, Bell, Mail } from "lucide-react";
+import { Stethoscope, ArrowRight, Shield, FileText, Brain } from "lucide-react";
+import Link from "next/link";
 
-export default function ComingSoonPage() {
+export default function HomePage() {
     const [theme, setTheme] = useState("light");
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const [email, setEmail] = useState("");
-    const [isSubscribed, setIsSubscribed] = useState(false);
+    
     useEffect(() => {
         const savedTheme = localStorage.getItem("theme") ||
             (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
@@ -17,7 +17,7 @@ export default function ComingSoonPage() {
 
     // Track mouse position for the gradient effect
     useEffect(() => {
-        const handleMouseMove = (e: { clientX: number; clientY: number; }) => {
+        const handleMouseMove = (e: MouseEvent) => {
             setMousePosition({ x: e.clientX, y: e.clientY });
         };
 
@@ -33,17 +33,6 @@ export default function ComingSoonPage() {
         setTheme(newTheme);
         localStorage.setItem("theme", newTheme);
         document.documentElement.setAttribute("data-theme", newTheme);
-    };
-
-    const handleSubscribe = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (email) {
-            // Here you would typically send this to your backend
-            console.log("Subscribing email:", email);
-            setIsSubscribed(true);
-            setTimeout(() => setIsSubscribed(false), 3000);
-            setEmail("");
-        }
     };
 
     const gradientStyle = {
@@ -81,8 +70,8 @@ export default function ComingSoonPage() {
                 )}
             </button>
 
-            {/* Main content with logo */}
-            <div className="z-10 flex flex-col items-center justify-center px-4 max-w-3xl mx-auto">
+            {/* Main content */}
+            <div className="z-10 flex flex-col items-center justify-center px-4 max-w-5xl mx-auto">
                 {/* Logo animation container */}
                 <div className="relative mb-4 animate-float">
                     <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 opacity-30 blur rounded-full" />
@@ -110,74 +99,61 @@ export default function ComingSoonPage() {
                     </p>
                 </div>
 
-                {/* Coming Soon message */}
-                <div className="mb-12 text-center">
+                {/* Hero section */}
+                <div className="mb-12 text-center max-w-2xl">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4 text-base-content animate-fadeInUp">
-                        Something Big Is Coming
+                        Your Personal Health Companion
                     </h2>
-                    <p className="text-base-content/80 text-lg max-w-md mx-auto animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-                        We're putting the finishing touches on DocToc, your personal AI health companion. Stay tuned for the revolution in healthcare assistance.
+                    <p className="text-base-content/80 text-lg mx-auto animate-fadeInUp mb-8" style={{ animationDelay: '0.3s' }}>
+                        DocToc helps you understand your medical reports, answer health questions, and provide personalized insights powered by advanced AI.
                     </p>
+                    
+                    {/* CTA Button */}
+                    <div className="animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+                        <Link href="/Chat" className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-medium text-lg transition-all hover:shadow-lg transform hover:scale-105">
+                            Get Started
+                            <ArrowRight className="ml-2" size={18} />
+                        </Link>
+                    </div>
                 </div>
 
-                {/* Email Notification Form */}
-                <div className="w-full max-w-md mb-12 animate-fadeInUp" style={{ animationDelay: '0.9s' }}>
-                    <form onSubmit={handleSubscribe} className="relative">
-                        <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/50" size={18} />
-                            <input
-                                type="email"
-                                placeholder="Enter your email for updates"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full pl-10 pr-32 py-3 rounded-full border border-base-300 bg-base-100/50 backdrop-blur-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base-content"
-                                required
-                            />
-                            <button
-                                type="submit"
-                                className="absolute right-1 top-1 bottom-1 px-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-medium transition-all hover:shadow-lg"
-                            >
-                                Notify Me
-                            </button>
-                        </div>
-                        {isSubscribed && (
-                            <div className="absolute mt-2 text-sm text-green-500 flex items-center">
-                                <Bell size={16} className="mr-1" />
-                                We'll notify you when we launch!
+                {/* Features section */}
+                <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 animate-fadeInUp" style={{ animationDelay: '0.9s' }}>
+                    <div className="p-6 bg-base-100/50 backdrop-blur-md rounded-lg shadow-md border border-base-300/50 hover:shadow-lg transition-all">
+                        <div className="flex items-center justify-center mb-4">
+                            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                                <FileText className="h-6 w-6 text-blue-500" />
                             </div>
-                        )}
-                    </form>
+                        </div>
+                        <h3 className="text-xl font-bold mb-2 text-center">Medical Reports Analysis</h3>
+                        <p className="text-base-content/70 text-center">Upload your medical reports and get them analyzed instantly for plain-language explanations.</p>
+                    </div>
+                    
+                    <div className="p-6 bg-base-100/50 backdrop-blur-md rounded-lg shadow-md border border-base-300/50 hover:shadow-lg transition-all">
+                        <div className="flex items-center justify-center mb-4">
+                            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+                                <Brain className="h-6 w-6 text-purple-500" />
+                            </div>
+                        </div>
+                        <h3 className="text-xl font-bold mb-2 text-center">AI-Powered Insights</h3>
+                        <p className="text-base-content/70 text-center">Advanced Grok AI technology provides accurate, personalized health information.</p>
+                    </div>
+                    
+                    <div className="p-6 bg-base-100/50 backdrop-blur-md rounded-lg shadow-md border border-base-300/50 hover:shadow-lg transition-all">
+                        <div className="flex items-center justify-center mb-4">
+                            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
+                                <Shield className="h-6 w-6 text-green-500" />
+                            </div>
+                        </div>
+                        <h3 className="text-xl font-bold mb-2 text-center">Privacy Focused</h3>
+                        <p className="text-base-content/70 text-center">Your medical data remains private and secure with state-of-the-art encryption.</p>
+                    </div>
                 </div>
-
-                {/* Features preview */}
-                {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl animate-fadeInUp" style={{ animationDelay: '1.2s' }}>
-                    <div className="backdrop-blur-md bg-base-100/30 rounded-xl p-6 shadow-lg transform transition-all hover:-translate-y-1 hover:shadow-xl">
-                        <div className="h-12 w-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-4">
-                            <Stethoscope className="h-6 w-6 text-blue-500" />
-                        </div>
-                        <h3 className="text-lg font-bold mb-2 text-base-content">AI Diagnostics</h3>
-                        <p className="text-base-content/70 text-sm">Get preliminary insights about your symptoms from our advanced AI system.</p>
-                    </div>
-                    <div className="backdrop-blur-md bg-base-100/30 rounded-xl p-6 shadow-lg transform transition-all hover:-translate-y-1 hover:shadow-xl">
-                        <div className="h-12 w-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-4">
-                            <Calendar className="h-6 w-6 text-purple-500" />
-                        </div>
-                        <h3 className="text-lg font-bold mb-2 text-base-content">Health Tracking</h3>
-                        <p className="text-base-content/70 text-sm">Monitor and track your health metrics over time with intuitive dashboards.</p>
-                    </div>
-                    <div className="backdrop-blur-md bg-base-100/30 rounded-xl p-6 shadow-lg transform transition-all hover:-translate-y-1 hover:shadow-xl">
-                        <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center mb-4">
-                            <Bell className="h-6 w-6 text-orange-500" />
-                        </div>
-                        <h3 className="text-lg font-bold mb-2 text-base-content">Smart Reminders</h3>
-                        <p className="text-base-content/70 text-sm">Never miss a medication or appointment with customized alerts.</p>
-                    </div>
-                </div> */}
             </div>
 
             {/* Footer signature */}
             <div className="absolute bottom-6 text-base-content/50 text-sm z-10 flex flex-col items-center">
-                <p>Powered by Groq AI</p>
+                <p>Powered by Grok AI</p>
                 <p className="mt-1">© {new Date().getFullYear()} DocToc. All rights reserved.</p>
             </div>
 
