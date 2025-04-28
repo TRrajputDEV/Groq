@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, FormEvent } from 'react';
 import { Stethoscope, Upload, Send, FileText, Check, ArrowLeft, Sun, Moon } from 'lucide-react';
 import Link from 'next/link';
-import { queryGrokAI, extractTextFromDocument } from '@/lib/grok-api';
+import { queryGroqAI, extractTextFromDocument } from '@/lib/groq-api';
 
 interface Message {
   id: number;
@@ -64,9 +64,19 @@ export default function MedicalChatPage() {
     setInputMessage('');
     setIsProcessing(true);
 
-    const res = await queryGrokAI({ message: userMsg.text });
-    setIsProcessing(false);
-    setMessages((prev) => [...prev, { id: Date.now(), text: res.text, type: 'assistant' }]);
+    try {
+      const res = await queryGroqAI({ message: userMsg.text });
+      setMessages((prev) => [...prev, { id: Date.now(), text: res.text, type: 'assistant' }]);
+    } catch (error) {
+      console.error("Error querying Groq:", error);
+      setMessages((prev) => [...prev, { 
+        id: Date.now(), 
+        text: "Sorry, I encountered an error processing your request. Please try again later.", 
+        type: 'assistant' 
+      }]);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,16 +93,28 @@ export default function MedicalChatPage() {
     setMessages((prev) => [...prev, sysMsg]);
     setIsAnalyzing(true);
 
-    // Extract and analyze
-    const text = await extractTextFromDocument(file);
-    const res = await queryGrokAI({ message: 'Analyze this medical report and explain in simple terms.', reportContent: text });
-
-    setIsAnalyzing(false);
-    setMessages((prev) => [...prev, { id: Date.now(), text: res.text, type: 'assistant' }]);
-
-    // Reset input and toast
-    setTimeout(() => setShowToast(false), 3000);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    try {
+      // Extract and analyze
+      const text = await extractTextFromDocument(file);
+      const res = await queryGroqAI({ 
+        message: 'Analyze this medical report and explain in simple terms.', 
+        reportContent: text 
+      });
+      
+      setMessages((prev) => [...prev, { id: Date.now(), text: res.text, type: 'assistant' }]);
+    } catch (error) {
+      console.error("Error analyzing file:", error);
+      setMessages((prev) => [...prev, { 
+        id: Date.now(), 
+        text: "Sorry, I encountered an error analyzing your file. Please try again or try a different file format.", 
+        type: 'assistant' 
+      }]);
+    } finally {
+      setIsAnalyzing(false);
+      // Reset input and toast
+      setTimeout(() => setShowToast(false), 3000);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   // Background gradient style
@@ -146,7 +168,7 @@ export default function MedicalChatPage() {
             </div>
           </div>
         ))}
-        {(isAnalyzing || isProcessing) && <LoadingDots color={isAnalyzing ? 'blue' : 'purple'} text={isAnalyzing ? 'Analyzing your report...' : 'Grok is thinking...'} />}
+        {(isAnalyzing || isProcessing) && <LoadingDots color={isAnalyzing ? 'blue' : 'purple'} text={isAnalyzing ? 'Analyzing your report...' : 'Groq is thinking...'} />}
         <div ref={messagesEndRef} />
       </main>
 
@@ -182,13 +204,9 @@ export default function MedicalChatPage() {
 function LoadingDots({ color, text }: { color: string; text: string }) {
   return (
     <div className="flex items-center justify-center py-2">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className={`w-2 h-2 rounded-full animate-pulse bg-${color}-500 mx-1`}
-          style={{ animationDelay: `${i * 200}ms` }}
-        />
-      ))}
+      <div className={`w-2 h-2 rounded-full animate-pulse bg-${color}-500 mx-1`} />
+      <div className={`w-2 h-2 rounded-full animate-pulse bg-${color}-500 mx-1`} style={{ animationDelay: '200ms' }} />
+      <div className={`w-2 h-2 rounded-full animate-pulse bg-${color}-500 mx-1`} style={{ animationDelay: '400ms' }} />
       <span className="ml-2 text-sm text-base-content/70">{text}</span>
     </div>
   );
