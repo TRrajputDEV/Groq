@@ -10,13 +10,18 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
         }
         
-        // Prepare the complete prompt
-        let prompt = message;
+        // Custom system prompt for medical report analysis
+        let systemPrompt = 'You are DocToc, a helpful AI health assistant specializing in analyzing medical reports and explaining medical information in clear, simple terms.';
+        
         if (reportContent) {
-            prompt = `${message}\n\nHere is the medical report content to analyze:\n${reportContent}`;
+            systemPrompt += ' Your task is to analyze the provided medical report and explain the findings, potential concerns, and recommendations in easy-to-understand language. Focus on the most important aspects first, then provide additional context if needed. Always maintain a compassionate and helpful tone.';
         }
         
-        console.log('Sending request to Groq API...');
+        // Prepare the user prompt
+        let userPrompt = message;
+        if (reportContent) {
+            userPrompt = `${message}\n\nHere is the medical report content to analyze:\n${reportContent}`;
+        }
         
         // Call Groq API
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -26,19 +31,19 @@ export async function POST(request: Request) {
                 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'llama3-8b-8192', // Using a smaller model as fallback
+                model: 'llama3-8b-8192', // Using Llama model
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are DocToc, a helpful AI health assistant. Provide clear, easy-to-understand explanations about medical information and reports.'
+                        content: systemPrompt
                     },
                     {
                         role: 'user',
-                        content: prompt
+                        content: userPrompt
                     }
                 ],
                 temperature: 0.7,
-                max_tokens: 1000
+                max_tokens: 2000
             }),
             cache: 'no-store'
         });
